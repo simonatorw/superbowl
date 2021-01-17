@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Superbowl</title>
+		<meta charset="utf-8" />
+		<style>
+			/* global */
+
+            :root {
+                --field-bg-color: darkgreen;
+                --home-bg-color: darkred;
+                --visit-bg-color: red;
+            }
+
+			body {
+				background-color: #000;
+				color: #fff;
+				font-family: verdana, sans-serif;
+				font-size: 12px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0;
+			}
+
+            h1 {
+                flex: 0 0 100%;
+                font-size: .8rem;
+                font-weight: normal;
+                color: #666;
+                text-align: center;
+            }
+
+			.arena {
+				flex: 0 0 600px;
+				padding: 20px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+			}
+			
+			.field {
+                flex: 0 0 600px;
+                height: 300px;
+                background-color: var(--visit-bg-color); /* visit bg color */
+                border: 1px solid white;
+                display: flex;
+            }
+
+            .home-10, .home-20, .home-30, .home-40,
+            .visit-10, .visit-20, .visit-30, .visit-40 {
+                flex: 0 0 49px;
+                height: 100%;
+                border-right: 1px solid #888;
+                background-color: var(--field-bg-color);
+            }
+
+            .home {
+                flex: 0 0 49px;
+                height: 100%;
+                border-right: 1px solid white;
+                background-color: var(--home-bg-color);
+            }
+
+            .visit {
+                flex: 0 0 49px;
+                height: 100%;
+                border-right: 1px solid white;
+                background-color: var(--field-bg-color);
+            }
+
+            .mid-field {
+                width: 49px;
+                height: 100%;
+                border-right: 1px solid white;
+                background-color: var(--field-bg-color);
+            }
+
+            .home-title {
+                color: #aaa;
+            }
+
+            .visit-title {
+                color: #aaa;
+            }
+
+            .home-swatch {
+                background-color: var(--home-bg-color);
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+            }
+
+            .visit-swatch {
+                display: inline-block;
+                background-color: var(--visit-bg-color);
+                width: 10px;
+                height: 10px;
+            }
+
+            .vs {
+                margin: 0 10px;
+            }
+			
+		</style>  
+
+	</head>
+	<body>
+		<div class="arena">
+            <h1>
+                <div class="home-swatch"></div>
+                <span class="home-title">Tampa Bay</span>
+                <span class="vs">v</span>
+                <div class="visit-swatch"></div>
+                <span class="visit-title">Kansas City</span>
+            </h1>
+			<div class="field">
+                <div class="home"></div>
+                <div class="home-10"></div>
+                <div class="home-20"></div>
+                <div class="home-30"></div>
+                <div class="home-40"></div>
+                <div class="mid-field"></div>
+                <div class="visit-40"></div>
+                <div class="visit-30"></div>
+                <div class="visit-20"></div>
+                <div class="visit-10"></div>
+                <div class="visit"></div>
+            </div>
+		</div>
+		
+
+		<script type="module">
+			import { el, rand, sleep, qry, qryAll, log, sortDesc, renderColorText } from '../lib/lib.js';
+			const data = [];
+		
+			(function(data) {
+				function loop() {
+                }
+				
+				function events() {
+				}
+			
+				function init() {
+					events();
+					loop();
+				}
+				
+				return {
+					init
+				};
+			})(data).init();
+		</script>
+	</body>
+</html>
