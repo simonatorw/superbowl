@@ -102,6 +102,17 @@
             .vs {
                 margin: 0 10px;
             }
+
+            #ball {
+                position: absolute;
+                width: 23px;
+                height: 12px;
+                background-color: darkgoldenrod;
+                border-radius: 30px;
+                border: 1px solid white;
+                top: 51%;
+                margin-left: 25px;
+            }
 			
 		</style>  
 
@@ -116,6 +127,7 @@
                 <span class="visit-title">Kansas City</span>
             </h1>
 			<div class="field">
+                <div id="ball"></div>
                 <div class="home"></div>
                 <div class="home-10"></div>
                 <div class="home-20"></div>
@@ -136,15 +148,41 @@
 			const data = [];
 		
 			(function(data) {
-				function loop() {
+                let animationId;
+                let left = 25;
+                let cnt = 0;
+
+				function moveBall(yards) {
+                    return new Promise((resolve) => {
+                    if (cnt > (yards * 5) && animationId) {
+                        cnt = 0;
+                        console.log('cancel');
+                        cancelAnimationFrame(animationId);
+                        resolve();
+                    } else {
+                        console.log('loop', yards);
+                        left = left + 1;
+                        el('ball').style('marginLeft',`${left}px`);
+                        cnt++;
+                        animationId = requestAnimationFrame(() => moveBall(yards));
+                    }
+                    });
+                }
+
+                async function loop(script) {
+                    for (let i = 0; i < script.length; i++) {
+                        await moveBall(script[i]);
+                        console.log(script[i])
+                    }
                 }
 				
 				function events() {
 				}
 			
-				function init() {
+				async function init() {
 					events();
-					loop();
+                    await moveBall(20);
+                    moveBall(10);
 				}
 				
 				return {
