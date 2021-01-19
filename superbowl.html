@@ -152,20 +152,44 @@
                 let left = 25;
                 let cnt = 0;
 
-				function moveBall(yards) {
-                    return new Promise((resolve) => {
-                    if (cnt > (yards * 5) && animationId) {
-                        cnt = 0;
-                        console.log('cancel');
-                        cancelAnimationFrame(animationId);
-                        resolve();
-                    } else {
-                        console.log('loop', yards);
-                        left = left + 1;
-                        el('ball').style('marginLeft',`${left}px`);
-                        cnt++;
-                        animationId = requestAnimationFrame(() => moveBall(yards));
+                function setAnimationInterval(callback, delay = 0) {
+                    const dateNow = Date.now;
+                    let start = dateNow();
+                    let stop;
+                    const intervalFunc = function() {
+                        dateNow() - start < delay || (start += delay, callback());
+                        stop || requestAnimationFrame(intervalFunc);
+                    };
+
+                    requestAnimationFrame(intervalFunc);
+
+                    return {
+                        clear: function() {
+                            stop = 1;
+                        }
                     }
+                }
+
+				function moveBall(yards) {
+                    return new Promise(resolve => {
+                        animationId = setAnimationInterval(() => {
+                            if ((yards >= 0 && cnt >= (yards * 5) && animationId) ||
+                                (yards < 0 && cnt <= (yards * 5) && animationId)) {
+                                resolve();
+                                cnt = 0;
+                                console.log('cancel');
+                                animationId.clear();
+                            } else {
+                                if (yards > 0) {
+                                    left++;
+                                    cnt++;
+                                } else {
+                                    left--;
+                                    cnt--;
+                                }
+                                el('ball').style('marginLeft',`${left}px`); 
+                            }
+                        });
                     });
                 }
 
@@ -175,14 +199,27 @@
                         console.log(script[i])
                     }
                 }
+
+                async function play() {
+                    let time = 0;
+                    let sum = 0;
+
+                    while(time < 15) {
+                        const yard = rand(-3, 10);
+                        time++;
+                        sum = sum + yard;
+                        console.log(time, yard, sum);
+                        await moveBall(yard);
+                    }
+                }
 				
 				function events() {
 				}
 			
-				async function init() {
+				function init() {
 					events();
-                    await moveBall(20);
-                    moveBall(10);
+                    //loop([30, -20, 3, -10, 97]);
+                    play();   
 				}
 				
 				return {
