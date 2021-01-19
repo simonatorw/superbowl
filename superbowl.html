@@ -32,6 +32,13 @@
                 text-align: center;
             }
 
+            #status {
+                flex: 0 0 100%;
+                font-weight: normal;
+                color: #fff;
+                margin-top: 6px;
+            }
+
 			.arena {
 				flex: 0 0 600px;
 				padding: 20px;
@@ -140,6 +147,7 @@
                 <div class="visit-10"></div>
                 <div class="visit"></div>
             </div>
+            <div id="status">&nbsp;</div>
 		</div>
 		
 
@@ -149,7 +157,7 @@
 		
 			(function(data) {
                 let animationId;
-                let left = 25;
+                let distance = 25;
                 let cnt = 0;
 
                 function setAnimationInterval(callback, delay = 0) {
@@ -181,13 +189,13 @@
                                 animationId.clear();
                             } else {
                                 if (yards > 0) {
-                                    left++;
+                                    distance++;
                                     cnt++;
                                 } else {
-                                    left--;
+                                    distance--;
                                     cnt--;
                                 }
-                                el('ball').style('marginLeft',`${left}px`); 
+                                el('ball').style('marginLeft',`${distance}px`); 
                             }
                         });
                     });
@@ -204,16 +212,37 @@
                     let time = 0;
                     let sum = 0;
 
-                    while(time < 15) {
-                        const yard = rand(-3, 10);
+                    while(time < 15 && sum < 100) {
+                        const yard = rand(-6, 17);
                         time++;
                         sum = sum + yard;
                         console.log(time, yard, sum);
                         await moveBall(yard);
                     }
+
+                    if (sum >= 100) {
+                        renderTd();
+                    }
+                }
+
+                function reset() {
+                    el('status').insert('&nbsp;');
+                    distance = 25;
+                }
+
+                function renderTd() {
+                    el('status').insert('Touchdown!')
                 }
 				
 				function events() {
+                    document.addEventListener('keydown', (e) => {
+                        const key = e.keyCode;
+
+                        if (key === 78) {
+                            reset();
+                            play();
+                        }
+                    }, true);
 				}
 			
 				function init() {
