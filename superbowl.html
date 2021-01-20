@@ -121,17 +121,28 @@
                 margin-left: 25px;
             }
 			
+            #home-score, #visit-score {
+                color: white;
+            }
+
+            #time {
+                position: absolute;
+                color: lightskyblue;
+            }
 		</style>  
 
 	</head>
 	<body>
 		<div class="arena">
             <h1>
+                <div id="time">1st Qtr</div>
                 <div class="home-swatch"></div>
                 <span class="home-title">Tampa Bay</span>
+                <span id="home-score">0</span>
                 <span class="vs">v</span>
                 <div class="visit-swatch"></div>
                 <span class="visit-title">Kansas City</span>
+                <span id="visit-score">0</span>
             </h1>
 			<div class="field">
                 <div id="ball"></div>
@@ -153,12 +164,18 @@
 
 		<script type="module">
 			import { el, rand, sleep, qry, qryAll, log, sortDesc, renderColorText } from '../lib/lib.js';
-			const data = [];
+            const data = [];
 		
 			(function(data) {
+                const HOME_COLOR = 'darkred';
+                const VISITOR_COLOR = 'red';
+
                 let animationId;
                 let distance = 25;
                 let cnt = 0;
+                let possession = 0;
+                let homeScore = 0;
+                let visitScore = 0;
 
                 function setAnimationInterval(callback, delay = 0) {
                     const dateNow = Date.now;
@@ -195,7 +212,7 @@
                                     distance--;
                                     cnt--;
                                 }
-                                el('ball').style('marginLeft',`${distance}px`); 
+                                renderBallPosition(distance); 
                             }
                         });
                     });
@@ -211,23 +228,122 @@
                 async function play() {
                     let time = 0;
                     let sum = 0;
+                    let down = 1;
 
-                    while(time < 15 && sum < 100) {
-                        const yard = rand(-6, 17);
-                        time++;
-                        sum = sum + yard;
-                        console.log(time, yard, sum);
-                        await moveBall(yard);
+                    while(time < 60) {
+                        calcTime(time);
+                        if (down > 3 || time === 30) {
+                            togglePossession();
+                            down = 1;
+                            punt();
+                        }
+                        const yard = rand(-3, 10);
+                    
+                        renderStatus(down, sum);
+                        await moveBall(possession ? yard : yard * -1);
+                        if (isTd()) {
+                            renderScore();
+                            renderTd();
+                            await sleep(.6);
+                            togglePossession();
+                            down = 1;
+                        }
+                        console.log(time, down, yard, 10 - sum);
+
+                        if (sum + yard < 10) {
+                            down++;
+                            sum = sum + (yard < 0 ? 0 : yard);
+                        } else {
+                            time++;
+                            down = 1;
+                            sum = 0;
+                        }
                     }
 
-                    if (sum >= 100) {
-                        renderTd();
-                    }
+                    renderTime(`4th Qtr 0:00`);
+
+                }
+
+                function punt() {
+
+                }
+
+                function ot() {
+
+                }
+
+                function calcTime(time) {
+                    const qtrs = ['1st Qtr', '2nd Qtr', '3rd Qtr', '4th Qtr'];
+
+                    renderTime(`${qtrs[Math.floor(time / 15)]} ${15 - time % 15}:00`);
+                }
+
+                function isTd() {
+                    return possession ? (distance - 25) / 5 >= 100 : (distance - 25) / 5 <= 0;
                 }
 
                 function reset() {
                     el('status').insert('&nbsp;');
                     distance = 25;
+                    possession = 0;
+                    togglePossession();
+                    renderScore(1);
+                }
+
+                function togglePossession() {
+                    possession = !possession;
+                    const color = possession ? HOME_COLOR : VISITOR_COLOR;
+
+                    renderPossession(color);
+                }
+
+                function renderTime(time) {
+                    el('time').insert(time);
+                }
+
+                function renderScore(isReset) {
+                    if (isReset) {
+                        homeScore = 0;
+                        el('home-score').insert(homeScore);
+                        visitScore = 0;
+                        el('visit-score').insert(visitScore);
+                    } else {
+                        if (possession) {
+                            homeScore = homeScore + 7;
+                            el('home-score').insert(homeScore);
+                        } else {
+                            visitScore = visitScore + 7;
+                            el('visit-score').insert(visitScore);
+                        }
+                    }
+                }
+
+                function renderPossession(color) {
+                    el('ball').style('backgroundColor', color);
+                }
+
+                function renderStatus(down, sum) {
+                    let downText = '';
+
+                    switch(down) {
+                        case 1:
+                            downText = '1st';
+                            break;
+                        case 2:
+                            downText = '2nd';
+                            break;
+                        case 3:
+                            downText = '3rd';
+                            break;
+                    }
+
+                    const calc = 10 - sum;
+
+                    el('status').insert(`${downText} down and ${calc}`);
+                }
+
+                function renderBallPosition(distance) {
+                    el('ball').style('marginLeft',`${distance}px`);
                 }
 
                 function renderTd() {
@@ -248,6 +364,7 @@
 				function init() {
 					events();
                     //loop([30, -20, 3, -10, 97]);
+                    togglePossession();
                     play();   
 				}
 				
