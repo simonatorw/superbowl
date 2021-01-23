@@ -233,11 +233,12 @@
                     while(time < 60) {
                         calcTime(time);
                         if (down > 3 || time === 30) {
-                            togglePossession();
                             down = 1;
                             punt();
+                            togglePossession();
+                            //alert(1)
                         }
-                        const yard = rand(-3, 10);
+                        const yard = rand(-3, 12);
                     
                         renderStatus(down, sum);
                         await moveBall(possession ? yard : yard * -1);
@@ -265,7 +266,19 @@
                 }
 
                 function punt() {
-
+                    if (possession) {
+                        if (distance < 50 * 5) {
+                            distance = 80 * 5;
+                        } else {
+                            distance = 100 * 5;
+                        }
+                    } else {
+                        if (distance > 50 * 5) {
+                            distance = (20 * 5) + 25;
+                        } else {
+                            distance = (1 * 25) + 25;
+                        }
+                    }
                 }
 
                 function ot() {
